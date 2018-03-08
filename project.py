@@ -49,5 +49,12 @@ else:
             cursor.execute('''INSERT INTO License_Data(DataID, LicenseID, Description, License_Name, Location, Street_number, Prefix, Street_name, Suffix, Longitude, Latitude, Expiration, SubType, SubDescription, IssueDate, ZIP_Code, District, Neighborhood, Zoning, EndorsementType, EndorsementTypeDescription, EndorsementStatusDescription, EndorsementIssuedDate, AGENCY, GPSX, GPSY)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
             db.commit()
-            
-print(cursor.execute('SELECT * FROM License_Data;').fetchmany(3))
+
+num_bars = cursor.execute("SELECT DISTINCT License_Name, ZIP_Code FROM License_Data WHERE SubDescription = 'Bar';")
+zip_list = cursor.execute("SELECT DISTINCT ZIP_Code FROM License_Data;")
+zip_count = cursor.execute("SELECT COUNT(DISTINCT ZIP_Code) FROM License_Data;")
+#print(num_bars.fetchmany(20))
+
+for row in cursor.execute("SELECT DISTINCT License_Name, ZIP_Code FROM License_Data WHERE SubDescription = 'Bar' AND ZIP_Code = 40205;"):
+    print(row)
+
