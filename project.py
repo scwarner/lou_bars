@@ -2,6 +2,15 @@ import csv
 import requests
 import sqlite3
 
+ABC_data = requests.get('https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv')
+raw_text = ABC_data.text
+
+license_list = raw_text.split('\r')
+formatted_list = [r.split(',') for r in license_list] 
+for row in formatted_list:
+    del row[5:9]
+print(formatted_list[3])
+
 db = sqlite3.connect('mydb.sqlite')
 cursor = db.cursor()
 cursor.execute("DROP TABLE IF EXISTS License_Data;")
@@ -50,11 +59,12 @@ else:
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
             db.commit()
 
-num_bars = cursor.execute("SELECT DISTINCT License_Name, ZIP_Code FROM License_Data WHERE SubDescription = 'Bar';")
+num_bars = cursor.execute("SELECT COUNT(DISTINCT License_Name) FROM License_Data WHERE SubDescription = 'Bar';")
 zip_list = cursor.execute("SELECT DISTINCT ZIP_Code FROM License_Data;")
 zip_count = cursor.execute("SELECT COUNT(DISTINCT ZIP_Code) FROM License_Data;")
-#print(num_bars.fetchmany(20))
 
-for row in cursor.execute("SELECT DISTINCT License_Name, ZIP_Code FROM License_Data WHERE SubDescription = 'Bar' AND ZIP_Code = 40205;"):
-    print(row)
+#for row in cursor.execute("SELECT DISTINCT License_Name, ZIP_Code FROM License_Data WHERE SubDescription = 'Bar' LIMIT 50;"):
+ #   print(row)
 
+# for row in cursor.execute("SELECT * FROM License_Data WHERE SubDescription = 'Bar' LIMIT 50;"):
+#    print(row)
