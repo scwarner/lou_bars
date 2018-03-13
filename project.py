@@ -57,12 +57,16 @@ else:
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
             db.commit()
 
-#num_bars = cursor.execute("SELECT COUNT(DISTINCT License_Name) FROM License_Data WHERE SubDescription = 'Bar';")
-bar_per_zip = cursor.execute("SELECT COUNT(DISTINCT Location), ZIP_Code FROM License_Data WHERE SubDescription = 'Bar' GROUP BY ZIP_Code;")
-#zip_list = cursor.execute("SELECT DISTINCT ZIP_Code FROM License_Data ORDER BY ZIP_Code ASC;")
-#zip_count = cursor.execute("SELECT COUNT(DISTINCT ZIP_Code) FROM License_Data;")
-#print(zip_list.fetchall())
-#print(bar_per_zip.fetchall())
+bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code FROM License_Data 
+                                    WHERE SubDescription = 'Bar' OR EndorsementTypeDescription = 'Microbrewery' 
+                                    GROUP BY ZIP_Code;""")
+nums_zips = bar_per_zip.fetchall()
 
 #for row in bar_per_zip:
 #    print(row)
+
+bar_nums = [row[0] for row in nums_zips]
+zip_codes = [row[1] for row in nums_zips]
+
+print(bar_nums)
+print(zip_codes)
