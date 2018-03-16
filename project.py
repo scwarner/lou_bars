@@ -1,6 +1,8 @@
 import csv
 import requests
 import sqlite3
+from bokeh.plotting import figure, output_file, show
+from bokeh.models import ColumnDataSource
 
 #ABC_data = requests.get('https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv')
 #raw_text = ABC_data.text
@@ -41,7 +43,7 @@ cursor.execute('''CREATE TABLE License_Data (
     ); 
     ''' )
 
-CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_1.csv"
+CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv"
 response = requests.get(CSV_URL)
 if response.status_code != 200:
     print("Failed to get data:", response.status_code)
@@ -62,11 +64,22 @@ bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code FR
                                     GROUP BY ZIP_Code;""")
 nums_zips = bar_per_zip.fetchall()
 
-#for row in bar_per_zip:
-#    print(row)
-
 bar_nums = [row[0] for row in nums_zips]
 zip_codes = [row[1] for row in nums_zips]
 
-print(bar_nums)
-print(zip_codes)
+#print(bar_nums)
+#print(zip_codes)
+output_file("lou_barchart.html")
+
+source = ColumnDataSource(data=dict(zip_codes=zip_codes, bar_nums=bar_nums))
+
+p = figure(x_range=zip_codes, y_range=bar_nums, plot_height=600, toolbar_location=None, title="Bars Per ZIP Code")
+p.vbar(x="zip_codes", top="bar_nums", width=0.9, color="#2868C7")
+
+p.xgrid.grid_line_color = None
+p.y_range.start = 0
+p.y_range.end = 40
+p.legend.orientation = "horizontal"
+p.legend.location = "top_center"
+
+show(p)
