@@ -64,22 +64,14 @@ bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code FR
                                     GROUP BY ZIP_Code;""")
 nums_zips = bar_per_zip.fetchall()
 
+output_file("lou_barchart.html")
+
 bar_nums = [row[0] for row in nums_zips]
 zip_codes = [row[1] for row in nums_zips]
 
-#print(bar_nums)
-#print(zip_codes)
-output_file("lou_barchart.html")
+p = figure(x_range=zip_codes, plot_width=800, plot_height=400)
 
-source = ColumnDataSource(data=dict(zip_codes=zip_codes, bar_nums=bar_nums))
-
-p = figure(x_range=zip_codes, y_range=bar_nums, plot_height=600, toolbar_location=None, title="Bars Per ZIP Code")
-p.vbar(x="zip_codes", top="bar_nums", width=0.9, color="#2868C7")
-
-p.xgrid.grid_line_color = None
-p.y_range.start = 0
-p.y_range.end = 40
-p.legend.orientation = "horizontal"
-p.legend.location = "top_center"
+p.vbar(x=zip_codes, width=0.5, bottom=0, top=bar_nums, color="#2868C7")
 
 show(p)
+
