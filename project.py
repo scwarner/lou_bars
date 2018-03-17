@@ -59,9 +59,11 @@ else:
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
             db.commit()
 
-bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code FROM License_Data 
+bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code 
+                                    FROM License_Data 
                                     WHERE SubDescription = 'Bar' OR EndorsementTypeDescription = 'Microbrewery' 
-                                    GROUP BY ZIP_Code;""")
+                                    GROUP BY ZIP_Code
+                                    ORDER BY COUNT(DISTINCT License_Name) DESC;""")
 nums_zips = bar_per_zip.fetchall()
 
 output_file("lou_barchart.html")
@@ -69,7 +71,10 @@ output_file("lou_barchart.html")
 bar_nums = [row[0] for row in nums_zips]
 zip_codes = [row[1] for row in nums_zips]
 
-p = figure(x_range=zip_codes, plot_width=800, plot_height=400)
+#print(bar_nums)
+#print(zip_codes)
+
+p = figure(x_range=zip_codes, plot_width=900, plot_height=400)
 
 p.vbar(x=zip_codes, width=0.5, bottom=0, top=bar_nums, color="#2868C7")
 
