@@ -1,18 +1,10 @@
 import csv
 import requests
 import sqlite3
+import pandas as pd
 from bokeh.plotting import figure, output_file, show
-from bokeh.models import ColumnDataSource
-
-#ABC_data = requests.get('https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv')
-#raw_text = ABC_data.text
-
-#license_list = raw_text.split('\r')
-#formatted_list = [r.split(',') for r in license_list] 
-#[del r[5:9] for r in formatted_list]
-#for row in formatted_list:
- #   del row[5:9]
-#print(formatted_list[3])
+from bokeh.models import ColumnDataSource, CategoricalColorMapper
+from bokeh.transform import factor_cmap
 
 db = sqlite3.connect('mydb.sqlite')
 cursor = db.cursor()
@@ -43,10 +35,22 @@ cursor.execute('''CREATE TABLE License_Data (
     ); 
     ''' )
 
-CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv"
+CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_1.csv"
 response = requests.get(CSV_URL)
-if response.status_code != 200:
+if response.status_code != 200 and response.status_code != 404:
     print("Failed to get data:", response.status_code)
+elif response.status_code == 404:
+    with open('data/LocationBasedLicenseData_3.csv', newline='') as csvfile:
+        wrapper = csv.reader(csvfile)
+        headerline = True
+        for record in wrapper:
+            del record[5:9]
+            if headerline:
+                headerline = False
+            else:
+                cursor.execute('''INSERT INTO License_Data(DataID, LicenseID, Description, License_Name, Location, Longitude, Latitude, Expiration, SubType, SubDescription, IssueDate, ZIP_Code, District, Neighborhood, Zoning, EndorsementType, EndorsementTypeDescription, EndorsementStatusDescription, EndorsementIssuedDate, AGENCY, GPSX, GPSY)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
+                db.commit()
 else:
     wrapper = csv.reader(response.text.strip().split('\n'))
     headerline = True
@@ -74,9 +78,15 @@ zip_codes = [row[1] for row in nums_zips]
 #print(bar_nums)
 #print(zip_codes)
 
-p = figure(x_range=zip_codes, plot_width=900, plot_height=400)
+#source = ColumnDataSource(data=dict(zip_codes=zip_codes[:10], bar_nums=bar_nums[:10]))
 
-p.vbar(x=zip_codes, width=0.5, bottom=0, top=bar_nums, color="#2868C7")
+TOOLTIPS = 'pan, box_zoom, reset, hover, save'
+p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Number of Bars Per ZIP Code")
+p.vbar(x=zip_codes[:10], width=0.5, bottom=0, top=bar_nums[:10], color='#ec7628')
+
+p.xgrid.grid_line_color = None
+p.y_range.start = 0
+
 
 show(p)
 
