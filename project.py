@@ -78,14 +78,16 @@ zip_codes = [row[1] for row in nums_zips]
 #print(bar_nums)
 #print(zip_codes)
 
-#source = ColumnDataSource(data=dict(zip_codes=zip_codes[:10], bar_nums=bar_nums[:10]))
+source = ColumnDataSource(data=dict(zip_codes=zip_codes[:10], bar_nums=bar_nums[:10], color=['#ec7628', '#2868c7', '#ec7628', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628']))
 
-TOOLTIPS = 'pan, box_zoom, reset, hover, save'
-p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Number of Bars Per ZIP Code")
-p.vbar(x=zip_codes[:10], width=0.5, bottom=0, top=bar_nums[:10], color='#ec7628')
+TOOLTIPS = 'pan, box_zoom, reset, save'
+p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Where are the most watering holes in Louisville?")
+p.vbar(x='zip_codes', width=0.5, bottom=0, top='bar_nums', color='color', source=source)
 
 p.xgrid.grid_line_color = None
 p.y_range.start = 0
+p.xaxis.axis_label = "ZIP codes with highest number of bars in Louisville"
+p.yaxis.axis_label = "Number of bars per ZIP code"
 
 
 show(p)
