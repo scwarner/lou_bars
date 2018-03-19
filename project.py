@@ -3,8 +3,8 @@ import requests
 import sqlite3
 import pandas as pd
 from bokeh.plotting import figure, output_file, show
-from bokeh.models import ColumnDataSource, CategoricalColorMapper
-from bokeh.transform import factor_cmap
+from bokeh.models import ColumnDataSource #, CategoricalColorMapper
+#from bokeh.transform import factor_cmap
 
 db = sqlite3.connect('mydb.sqlite')
 cursor = db.cursor()
@@ -65,7 +65,9 @@ else:
 
 bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code 
                                     FROM License_Data 
-                                    WHERE SubDescription = 'Bar' OR EndorsementTypeDescription = 'Microbrewery' 
+                                    WHERE SubDescription = 'Bar' 
+                                    OR EndorsementTypeDescription = 'Microbrewery' 
+                                    OR License_Name LIKE '%Bar%'
                                     GROUP BY ZIP_Code
                                     ORDER BY COUNT(DISTINCT License_Name) DESC;""")
 nums_zips = bar_per_zip.fetchall()
@@ -78,7 +80,10 @@ zip_codes = [row[1] for row in nums_zips]
 #print(bar_nums)
 #print(zip_codes)
 
-source = ColumnDataSource(data=dict(zip_codes=zip_codes[:10], bar_nums=bar_nums[:10], color=['#ec7628', '#2868c7', '#ec7628', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628']))
+source = ColumnDataSource(data=dict(
+    zip_codes=zip_codes[:10], 
+    bar_nums=bar_nums[:10], 
+    color=['#ec7628', '#2868c7', '#ec7628', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628']))
 
 TOOLTIPS = 'pan, box_zoom, reset, save'
 p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Where are the most watering holes in Louisville?")
