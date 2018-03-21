@@ -67,7 +67,7 @@ bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code
                                     FROM License_Data 
                                     WHERE SubDescription = 'Bar' 
                                     OR EndorsementTypeDescription = 'Microbrewery' 
-                                    OR License_Name LIKE '%Bar%'
+                                    OR License_Name LIKE '%Bar%' OR License_Name LIKE '%Pub%' OR License_Name LIKE'%Tavern%'
                                     GROUP BY ZIP_Code
                                     ORDER BY COUNT(DISTINCT License_Name) DESC;""")
 nums_zips = bar_per_zip.fetchall()
@@ -83,11 +83,12 @@ zip_codes = [row[1] for row in nums_zips]
 source = ColumnDataSource(data=dict(
     zip_codes=zip_codes[:10], 
     bar_nums=bar_nums[:10], 
-    color=['#ec7628', '#2868c7', '#ec7628', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628']))
+    color=['#ec7628', '#2868c7', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628'],
+    label=['Other ZIP', 'Highlands ZIP', 'Highlands ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP']))
 
 TOOLTIPS = 'pan, box_zoom, reset, save'
 p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Where are the most watering holes in Louisville?")
-p.vbar(x='zip_codes', width=0.5, bottom=0, top='bar_nums', color='color', source=source)
+p.vbar(x='zip_codes', width=0.5, bottom=0, top='bar_nums', color='color', legend='label', source=source)
 
 p.xgrid.grid_line_color = None
 p.y_range.start = 0
