@@ -35,13 +35,13 @@ cursor.execute('''CREATE TABLE License_Data (
     ''')
 
 # Request data from Louisville Open Data
-CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_1.csv"
+CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv"
 response = requests.get(CSV_URL)
 if response.status_code != 200 and response.status_code != 404:
     print("Failed to get data:", response.status_code)
 # If URL is not available, pull data from CSV file in Data and insert into table
 elif response.status_code == 404:
-    with open('data/LocationBasedLicenseData_1.csv', newline='') as csvfile:
+    with open('data/LocationBasedLicenseData_3.csv', newline='') as csvfile:
         wrapper = csv.reader(csvfile)
         headerline = True
         for record in wrapper:
