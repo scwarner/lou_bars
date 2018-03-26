@@ -81,8 +81,8 @@ nums_zips = bar_per_zip.fetchall()
 bar_nums = [row[0] for row in nums_zips]
 zip_codes = [row[1] for row in nums_zips]
 
-# print(bar_nums)
-# print(zip_codes)
+#print(bar_nums)
+#print(zip_codes)
 
 # Output to HTML file
 output_file("lou_barchart.html")
