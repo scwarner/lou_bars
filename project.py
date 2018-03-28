@@ -65,48 +65,48 @@ else:
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (record))
             db.commit()
 
-# SQL query to find out number of bars per ZIP Code 
-bar_per_zip = cursor.execute("""SELECT COUNT(DISTINCT License_Name), ZIP_Code
+# SQL query to find out number of bars per District
+bar_per_district = cursor.execute("""SELECT COUNT(DISTINCT License_Name), District
                                     FROM License_Data
                                     WHERE SubDescription = 'Bar'
                                     OR EndorsementTypeDescription = 'Microbrewery'
                                     OR License_Name LIKE '%Bar%' OR License_Name LIKE '%Pub%' OR License_Name LIKE'%Tavern%'
-                                    GROUP BY ZIP_Code
+                                    GROUP BY District
                                     ORDER BY COUNT(DISTINCT License_Name) DESC;""")
 
 # Save results from query into a variable
-nums_zips = bar_per_zip.fetchall()
+nums_districts = bar_per_district.fetchall()
 
-# Create two lists: One for number of bars and the other for corresponding ZIP codes
-bar_nums = [row[0] for row in nums_zips]
-zip_codes = [row[1] for row in nums_zips]
+# Create two lists: One for number of bars and the other for corresponding districts
+bar_nums = [row[0] for row in nums_districts]
+districts = [row[1] for row in nums_districts]
 
 #print(bar_nums)
-#print(zip_codes)
+#print(districts)
 
 # Output to HTML file
 output_file("lou_barchart.html")
 
 # Determine how data will be visualized
 source = ColumnDataSource(data=dict(
-    zip_codes=zip_codes[:10],
+    districts=districts[:10],
     bar_nums=bar_nums[:10],
-    color=['#ec7628', '#2868c7', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628'],
-    label=['Other ZIP', 'Highlands ZIP', 'Highlands ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP', 'Other ZIP']))
+    color=['#ec7628', '#2868c7', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628', '#ec7628'],
+    label=['Other', 'Highlands District', 'Other', 'Other', 'Other', 'Other', 'Other', 'Other', 'Other', 'Other']))
 
 # Determine which tools to include in chart
 TOOLTIPS = 'pan, box_zoom, reset, save'
 
 # Create a new plot with toolbar information and title
-p = figure(x_range=zip_codes[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Where are the most watering holes in Louisville?")
+p = figure(x_range=districts[:10], plot_width=900, plot_height=400, toolbar_location='below', tools=TOOLTIPS, title="Where are the most watering holes in Louisville?")
 
 # Create bar chart with data saved in source
-p.vbar(x='zip_codes', width=0.5, bottom=0, top='bar_nums', color='color', legend='label', source=source)
+p.vbar(x='districts', width=0.5, bottom=0, top='bar_nums', color='color', legend='label', source=source)
 
 p.xgrid.grid_line_color = None
 p.y_range.start = 0
-p.xaxis.axis_label = "ZIP codes with highest number of bars in Louisville"
-p.yaxis.axis_label = "Number of bars per ZIP code"
+p.xaxis.axis_label = "Districts with highest number of bars in Louisville"
+p.yaxis.axis_label = "Number of bars per district"
 
 # Show the results
 show(p)
