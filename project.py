@@ -35,7 +35,7 @@ cursor.execute('''CREATE TABLE License_Data (
     ''')
 
 # Request data from Louisville Open Data
-CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_3.csv"
+CSV_URL = "https://data.louisvilleky.gov/sites/default/files/LocationBasedLicenseData_1.csv"
 response = requests.get(CSV_URL)
 if response.status_code != 200 and response.status_code != 404:
     print("Failed to get data:", response.status_code)
